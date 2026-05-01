@@ -1,0 +1,67 @@
+{
+    "DISCORD_SERVER_ID": "",
+    "STEAM_API_KEY": "",
+
+    "GLOBAL_POP_BOT": {
+        "ENABLED": false,
+        "BOT_TOKEN": "",
+        "MULTI_MESSAGE": {
+            "ENABLED": false,
+            "PLAYER_COUNT_MESSAGE": "({playersOnline}/{maxPlayers}) Online!..",
+            "PLAYERS_JOINING_MESSAGE": "({playersOnline}/{maxPlayers}) ⇋ ({joiningPlayers} Joining!)",
+            "PLAYERS_QUEUED_MESSAGE": "({playersOnline}/{maxPlayers}) ⇋ ({queuedPlayers} Queued!)"
+        },
+        "SINGLE_MESSAGE": {
+            "PLAYER_COUNT_MESSAGE": "{OnlineJoiningQueued} Online!"
+        }
+    },
+
+    "PLAYER_PROFILER": {
+        "ENABLED": false,
+        "BOT_TOKEN": "",
+
+        "Update player steam info every x hours (Will update a users steam data once a user joins the server after this threshold)": 24,
+    
+        "GLOBAL_LEADERBOARD": {
+            "ENABLED": false,
+            "CHANNEL_ID": "",
+            "COLOR(original, green, blue, black, yellow, orange, pink, red, purple, custom)": "blue",
+            "CUSTOM_COLOR": "#242424"
+        },
+
+        "PROFILE_VIEW": {
+            "ENABLED": false,
+            "REQUIRE_ROLES": false,
+            "REQUIRED_ROLES": [ "ROLE_ID", "ROLE_ID" ]
+        },
+
+        "STATS_COMMAND": {
+            "ENABLED": false,
+            "REQUIRE_ROLES": false,
+            "REQUIRED_ROLES": [ "ROLE_ID", "ROLE_ID" ],
+            "COLOR(original, green, blue, black, yellow, orange, pink, red, purple)": "black"
+        },
+
+        "ACCOUNT_CHECKS_WHITELISTER": {
+            "ENABLED": false,
+            "REQUIRE_ROLES": false,
+            "REQUIRED_ROLES": [ "ROLE_ID", "ROLE_ID" ]
+        },
+
+        "WATCHLIST": {
+            "ENABLED": false,
+            "REQUIRE_ROLES": false,
+            "REQUIRED_ROLES": [ "ROLE_ID", "ROLE_ID" ],
+            "ALERT_ROLES": ["ROLE_ID", "ROLE_ID"],
+            "SIMPLE_FORMATTING": true,
+            "ALERT_WEBHOOK": "",
+            "EMBED_COLOR": "#f56642"
+        },
+
+        "F7_PLAYER_SETTINGS": {
+            "ENABLED": false,
+            "REQUIRE_ROLES": true,
+            "REQUIRED_ROLES": [ "ROLE_ID", "ROLE_ID" ]
+        }
+    }
+}

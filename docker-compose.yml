@@ -1,0 +1,10 @@
+services:
+  ultimate-rcon:
+    build: .
+    container_name: ultimate-rcon
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./src/database:/app/src/database
+      - ./src/images/imagestorage:/app/src/images/imagestorage
