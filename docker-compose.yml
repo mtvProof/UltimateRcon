@@ -5,6 +5,18 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - GIT_REPO=https://github.com/mtvProof/UltimateRcon.git
+      - GIT_BRANCH=main
+      - REPO_DIR=/bot/repo
+      - LOCAL_CONFIGS_DIR=/bot/local-configs
+      - LOCAL_DATABASE_DIR=/bot/local-database
+      - LOCAL_IMAGESTORE_DIR=/bot/local-imagestorage
     volumes:
-      - ./src/database:/app/src/database
-      - ./src/images/imagestorage:/app/src/images/imagestorage
+      - ur_bot_repo:/bot
+      - ./CONFIGS:/bot/local-configs
+      - ./src/database:/bot/local-database
+      - ./src/images/imagestorage:/bot/local-imagestorage
+
+volumes:
+  ur_bot_repo:

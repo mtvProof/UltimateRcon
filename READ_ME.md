@@ -47,7 +47,8 @@ I will walk you through the order that I recommend.
 
 # 5. GITHUB + DOCKER DEPLOYMENT
     - This package is now ready to run in Docker using environment variables.
-    - You no longer need to edit JSON files in your container image to change runtime config.
+    - The Docker container now clones/pulls from your GitHub repo on startup.
+    - Your local `CONFIGS` folder is mounted into the container and used directly.
 
     > 5a. ENVIRONMENT VARIABLE FORMAT
         - Global config file (`CONFIGS/config.json`) uses this prefix:
@@ -72,9 +73,18 @@ I will walk you through the order that I recommend.
 
     > 5c. BUILD + RUN WITH DOCKER
         - Build and start with Docker Compose.
-        - The compose file mounts `src/database` and `src/images/imagestorage` so your DB and generated images persist.
+        - The compose file mounts:
+            - `./CONFIGS -> /bot/CONFIGS`
+            - `./src/database -> /bot/src/database`
+            - `./src/images/imagestorage -> /bot/src/images/imagestorage`
+        - So your local config files are always used at runtime.
 
-    > 5d. PUSH TO GITHUB
+    > 5d. UPDATE FLOW (push then pull)
+        - Push your changes to GitHub.
+        - Restart the container.
+        - On restart, it fetches and resets to the latest `origin/main`.
+
+    > 5e. PUSH TO GITHUB
         - Initialize git (if needed), add your remote repo, commit, and push.
         - Remote URL for this project:
             - `https://github.com/mtvProof/UltimateRcon`

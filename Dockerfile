@@ -1,6 +1,6 @@
 FROM node:20-bookworm
 
-WORKDIR /app
+WORKDIR /opt/app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -10,12 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgif-dev \
     librsvg2-dev \
     python3 \
+    git \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
-RUN npm install
+COPY docker/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
-COPY . .
+ENV REPO_DIR=/bot
 
-CMD ["npm", "start"]
+ENTRYPOINT ["/usr/local/bin/start.sh"]
