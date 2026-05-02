@@ -14,8 +14,8 @@ module.exports = {
     .addBooleanOption(Option => Option.setName('ignore_reports_against').setDescription("If the users f7 reports towards players should be ignored").setRequired(true)),
     run: async (client, interaction) => {
 
-      if(!config.PLAYER_PROFILER.STATS_COMMAND.ENABLED) return interaction.reply("This command has been disabled in the config.");
-      if(config.PLAYER_PROFILER.STATS_COMMAND.REQUIRE_ROLES && !config.PLAYER_PROFILER.STATS_COMMAND.REQUIRED_ROLES.find(id => interaction.member.roles.cache.has(id))) return interaction.reply("You do not have permission to use this command");
+      if(!config.PLAYER_PROFILER.F7_PLAYER_SETTINGS.ENABLED) return interaction.reply("This command has been disabled in the config.");
+      if(config.PLAYER_PROFILER.F7_PLAYER_SETTINGS.REQUIRE_ROLES && !config.PLAYER_PROFILER.F7_PLAYER_SETTINGS.REQUIRED_ROLES.find(id => interaction.member.roles.cache.has(id))) return interaction.reply("You do not have permission to use this command");
 
       let steamIdCheck = /7656119([0-9]{10})/gm;
       

@@ -422,10 +422,13 @@ servers.forEach((server, index) => {
 
     client.on('messageCreate', message => {
         if(message.author.bot) return;
-        let isCommand = message.content.split(server.RCON_SETTINGS.RCON_COMMANDS.COMMAND_PREFIX)[1];
+        let commandPrefix = server.RCON_SETTINGS.RCON_COMMANDS.COMMAND_PREFIX;
+        let isCommand = message.content.startsWith(commandPrefix) ? message.content.slice(commandPrefix.length).trim() : undefined;
         
         if(server.RCON_SETTINGS.RCON_COMMANDS.ENABLED && isCommand) {
-            if(server.RCON_SETTINGS.RCON_COMMANDS.STAFF_ROLES.find(x => message.member.roles.cache.has(x)) && server.RCON_SETTINGS.RCON_COMMANDS.COMMAND_CHANNEL_IDS.find(x => message.channel.id == x)) {
+            if(!server.RCON_SETTINGS.RCON_COMMANDS.COMMAND_CHANNEL_IDS.find(x => message.channel.id == x)) return;
+
+            if(server.RCON_SETTINGS.RCON_COMMANDS.STAFF_ROLES.find(x => message.member.roles.cache.has(x))) {
                 try {
                     let randomNumber = Math.trunc(getRandomInt(1001, 1000000));
                     rcon.send(`${isCommand}`, "urplus", randomNumber); 
@@ -590,6 +593,33 @@ function getPlayerInfo(steamId, serverId) {
     });
 }
 
+function getGlobalPlayerFlags(steamId) {
+    return new Promise((resolve) => {
+        db.get(
+            "select checker_whitelisted, watchlist, ignore_f7_from, ignore_f7_against from player_info where steam_id = ? order by lastUpdated desc limit 1;",
+            [steamId],
+            function(err, row) {
+                if(err) {
+                    console.log(err);
+                    return resolve({
+                        checker_whitelisted: 0,
+                        watchlist: 0,
+                        ignore_f7_from: 0,
+                        ignore_f7_against: 0
+                    });
+                }
+
+                resolve(row || {
+                    checker_whitelisted: 0,
+                    watchlist: 0,
+                    ignore_f7_from: 0,
+                    ignore_f7_against: 0
+                });
+            }
+        );
+    });
+}
+
 
 async function addPlayerData(steamId, server) {
     try {
@@ -597,13 +627,14 @@ async function addPlayerData(steamId, server) {
 
         if (playerInfo == undefined) {
             let steamInfo = await getSteamData(steamId);
+            let globalFlags = await getGlobalPlayerFlags(steamId);
 
             if(!steamInfo) {
                 console.log("Could not gather users Steam Info");
                 return;
             }
 
-            db.run("insert into player_info (steam_id, server_id, picture, name, profile_url, lastUpdated) values (?,?,?,?,?,?)", [ steamId, server.SERVER_SPECIAL_ID, steamInfo.avatarfull, steamInfo.personaname, steamInfo.profileurl, Date.now() / 1000 ]);
+            db.run("insert into player_info (steam_id, server_id, picture, name, profile_url, lastUpdated, checker_whitelisted, watchlist, ignore_f7_from, ignore_f7_against) values (?,?,?,?,?,?,?,?,?,?)", [ steamId, server.SERVER_SPECIAL_ID, steamInfo.avatarfull, steamInfo.personaname, steamInfo.profileurl, Date.now() / 1000, globalFlags.checker_whitelisted || 0, globalFlags.watchlist || 0, globalFlags.ignore_f7_from || 0, globalFlags.ignore_f7_against || 0 ]);
             playerInfo = await getPlayerInfo(steamId, server.SERVER_SPECIAL_ID);
             }   else if(playerInfo?.lastUpdated + (config.PLAYER_PROFILER['Update player steam info every x hours (Will update a users steam data once a user joins the server after this threshold)'] * 3600) <= Date.now() / 1000) {
             let steamInfo = await getSteamData(steamId);
