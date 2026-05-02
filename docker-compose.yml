@@ -12,7 +12,7 @@ services:
       - LOCAL_IMAGESTORE_DIR=/bot/local-imagestorage
     volumes:
       - ur_bot_repo:/bot
-      - ./CONFIGS:/bot/local-configs
+      - ${CONFIGS_DIR}:/bot/local-configs
       - ./src/database:/bot/local-database
       - ./src/images/imagestorage:/bot/local-imagestorage
 
