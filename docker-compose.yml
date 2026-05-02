@@ -3,8 +3,6 @@ services:
     build: .
     container_name: ultimate-rcon
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       - GIT_REPO=https://github.com/mtvProof/UltimateRcon.git
       - GIT_BRANCH=main

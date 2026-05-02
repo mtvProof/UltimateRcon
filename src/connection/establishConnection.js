@@ -407,6 +407,17 @@ servers.forEach((server, index) => {
         runConnection();
         if(server.LEADERBOARD.ENABLED) leaderboard(server, client);
         if(server.SERVER_STATUS_PAGE.ENABLED) serverStatusPage(server, client);
+
+        // Clear all guild slash commands for this server bot (removes any previously registered commands)
+        try {
+            const serverBotRest = new REST({ version: '10' }).setToken(server.BOT_TOKEN);
+            await serverBotRest.put(
+                Routes.applicationGuildCommands(client.user.id, config.DISCORD_SERVER_ID),
+                { body: [] }
+            );
+        } catch (err) {
+            console.error(`Failed to clear slash commands for ${server.SERVER_SHORTNAME}:`, err);
+        }
     });
 
     client.on('messageCreate', message => {

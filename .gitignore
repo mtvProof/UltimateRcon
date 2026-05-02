@@ -7,3 +7,4 @@ yarn-error.log*
 .env.*
 !.env.example
 src/images/imagestorage/*.png
+CONFIGS/
