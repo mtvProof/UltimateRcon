@@ -529,15 +529,29 @@ async function handleF7Report(f7Object, server) {
 }
 
 function checkWatchlist(playerObject) {
-    if(playerObject.watchlist) {
-        let hook = new discord.WebhookClient({ url: config.PLAYER_PROFILER.WATCHLIST.ALERT_WEBHOOK });
-        const roles = [];
-        for(let role of config.PLAYER_PROFILER.WATCHLIST.ALERT_ROLES) if(!role.length > 8) roles.push(`<@&${role}>`);
+    if(Number(playerObject.watchlist) !== 1) return;
+    if(!config.PLAYER_PROFILER.WATCHLIST.ALERT_WEBHOOK) return;
 
-        let simpleMessage = `⚠️ **[${playerObject.name}](<${playerObject.profile_url}>)** has joined and is on the **watchlist**!`;
-        let fancyMessage = `**User:** [${playerObject.name}](${playerObject.profile_url})\n**SteamID:** [${playerObject.steam_id}](${playerObject.profile_url}) / [BM](https://www.battlemetrics.com/rcon/players?filter%5Bsearch%5D=${playerObject.steam_id})`;
-        if(config.PLAYER_PROFILER.WATCHLIST.SIMPLE_FORMATTING) sendSimpleMessage(simpleMessage, hook);
-        else sendFancyMessage(fancyMessage, config.PLAYER_PROFILER.WATCHLIST.EMBED_COLOR, "Watchlisted player joined", hook, { name: `${playerObject.name} | WATCHLIST ALERT`, iconURL: playerObject.picture, url: playerObject.profile_url }, playerObject.picture);
+    let hook = new discord.WebhookClient({ url: config.PLAYER_PROFILER.WATCHLIST.ALERT_WEBHOOK });
+    const roles = [];
+    for(let role of config.PLAYER_PROFILER.WATCHLIST.ALERT_ROLES || []) {
+        if(typeof role === "string" && role.length > 8 && role !== "ROLE_ID") roles.push(`<@&${role}>`);
+    }
+
+    const rolePing = roles.join(" ");
+    let simpleMessage = `${rolePing}${rolePing.length ? "\n" : ""}⚠️ **[${playerObject.name}](<${playerObject.profile_url}>)** has joined and is on the **watchlist**!`;
+    let fancyMessage = `**User:** [${playerObject.name}](${playerObject.profile_url})\n**SteamID:** [${playerObject.steam_id}](${playerObject.profile_url}) / [BM](https://www.battlemetrics.com/rcon/players?filter%5Bsearch%5D=${playerObject.steam_id})`;
+    if(config.PLAYER_PROFILER.WATCHLIST.SIMPLE_FORMATTING) sendSimpleMessage(simpleMessage, hook);
+    else {
+        const embed = new discord.EmbedBuilder()
+            .setColor(config.PLAYER_PROFILER.WATCHLIST.EMBED_COLOR)
+            .setFooter({ text: "Watchlisted player joined" })
+            .setTimestamp()
+            .setDescription(fancyMessage)
+            .setThumbnail(playerObject.picture)
+            .setAuthor({ name: `${playerObject.name} | WATCHLIST ALERT`, iconURL: playerObject.picture, url: playerObject.profile_url });
+
+        hook.send({ content: rolePing, embeds: [embed] });
     }
 }
 
