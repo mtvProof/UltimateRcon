@@ -104,6 +104,8 @@ function loadGlobalConfig() {
     if (ENV_ONLY_MODE) {
         config = buildConfigFromEnv('UR_CONFIG');
         console.log('[ConfigLoader] Running in ENV_ONLY mode - loaded config from environment variables');
+        console.log('[ConfigLoader] Global config keys:', Object.keys(config));
+        console.log('[ConfigLoader] PLAYER_PROFILER exists:', !!config.PLAYER_PROFILER);
     } else {
         // Legacy mode: read from JSON file and allow env overrides
         if (fs.existsSync(CONFIG_PATH)) {
