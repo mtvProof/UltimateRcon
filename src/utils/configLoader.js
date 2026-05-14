@@ -102,6 +102,15 @@ function loadGlobalConfig() {
     
     // If ENV_ONLY_MODE, build config entirely from environment variables
     if (ENV_ONLY_MODE) {
+        // Debug: List all UR_CONFIG env vars
+        const urConfigVars = Object.keys(process.env).filter(k => k.startsWith('UR_CONFIG'));
+        console.log('[ConfigLoader] Found', urConfigVars.length, 'UR_CONFIG environment variables');
+        if (urConfigVars.length === 0) {
+            console.error('[ConfigLoader] ERROR: No UR_CONFIG__ environment variables found!');
+            console.error('[ConfigLoader] Make sure environment variables are properly set in Portainer.');
+            console.error('[ConfigLoader] Sample env vars present:', Object.keys(process.env).slice(0, 10));
+        }
+        
         config = buildConfigFromEnv('UR_CONFIG');
         console.log('[ConfigLoader] Running in ENV_ONLY mode - loaded config from environment variables');
         console.log('[ConfigLoader] Global config keys:', Object.keys(config));
