@@ -11,7 +11,8 @@ mkdir -p "$REPO_DIR"
 
 if [ ! -d "$REPO_DIR/.git" ]; then
     echo "[start] Cloning repository $GIT_REPO (branch: $GIT_BRANCH)"
-    rm -rf "$REPO_DIR"
+    # Don't use rm -rf, instead just clone into the directory
+    # This prevents issues with mounted volumes
     git clone --branch "$GIT_BRANCH" "$GIT_REPO" "$REPO_DIR"
 else
     echo "[start] Pulling latest from origin/$GIT_BRANCH"
