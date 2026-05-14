@@ -5,6 +5,9 @@ const ROOT_PATH = path.resolve(__dirname, '..', '..');
 const CONFIG_PATH = path.join(ROOT_PATH, 'CONFIGS', 'config.json');
 const SERVER_CONFIGS_PATH = path.join(ROOT_PATH, 'CONFIGS', 'SERVERS');
 
+// Check if we're running in env-only mode (no config files needed)
+const ENV_ONLY_MODE = process.env.UR_ENV_ONLY === 'true';
+
 function parseEnvValue(rawValue) {
     if (rawValue === 'true') return true;
     if (rawValue === 'false') return false;
@@ -69,23 +72,110 @@ function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function buildConfigFromEnv(envPrefix) {
+    const config = {};
+    const prefix = `${envPrefix}__`;
+    
+    Object.keys(process.env).forEach((key) => {
+        if (!key.startsWith(prefix)) return;
+        
+        const path = key.substring(prefix.length).split('__');
+        let current = config;
+        
+        for (let i = 0; i < path.length - 1; i++) {
+            const part = path[i];
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        
+        const finalKey = path[path.length - 1];
+        current[finalKey] = parseEnvValue(process.env[key]);
+    });
+    
+    return config;
+}
+
 function loadGlobalConfig() {
-    const config = readJson(CONFIG_PATH);
-    return applyEnvOverrides(config, 'UR_CONFIG');
+    let config = {};
+    
+    // If ENV_ONLY_MODE, build config entirely from environment variables
+    if (ENV_ONLY_MODE) {
+        config = buildConfigFromEnv('UR_CONFIG');
+        console.log('[ConfigLoader] Running in ENV_ONLY mode - loaded config from environment variables');
+    } else {
+        // Legacy mode: read from JSON file and allow env overrides
+        if (fs.existsSync(CONFIG_PATH)) {
+            config = readJson(CONFIG_PATH);
+            applyEnvOverrides(config, 'UR_CONFIG');
+        } else {
+            console.warn(`[ConfigLoader] Config file not found at ${CONFIG_PATH}, falling back to env-only mode`);
+            config = buildConfigFromEnv('UR_CONFIG');
+        }
+    }
+    
+    return config;
 }
 
 function loadServerConfigs() {
-    return fs.readdirSync(SERVER_CONFIGS_PATH)
-        .filter((fileName) => fileName.endsWith('.json'))
-        .map((fileName) => {
-            const config = readJson(path.join(SERVER_CONFIGS_PATH, fileName));
-            const filePrefix = `UR_${path.basename(fileName, '.json').toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
-
-            applyEnvOverrides(config, filePrefix);
-            applyEnvOverrides(config, 'UR_SERVER_DEFAULT');
-
-            return config;
+    const configs = [];
+    
+    if (ENV_ONLY_MODE) {
+        // Build server configs from environment variables
+        // Look for UR_SERVER1__, UR_SERVER2__, etc.
+        const serverPrefixes = new Set();
+        Object.keys(process.env).forEach((key) => {
+            const match = key.match(/^UR_(SERVER\d+)__/);
+            if (match) {
+                serverPrefixes.add(match[1]);
+            }
         });
+        
+        serverPrefixes.forEach((prefix) => {
+            const config = buildConfigFromEnv(`UR_${prefix}`);
+            if (config.SERVER_ENABLED !== false) {
+                configs.push(config);
+            }
+        });
+        
+        console.log(`[ConfigLoader] Loaded ${configs.length} server config(s) from environment variables`);
+    } else {
+        // Legacy mode: read from JSON files
+        if (fs.existsSync(SERVER_CONFIGS_PATH)) {
+            const serverFiles = fs.readdirSync(SERVER_CONFIGS_PATH)
+                .filter((fileName) => fileName.endsWith('.json'));
+            
+            serverFiles.forEach((fileName) => {
+                const config = readJson(path.join(SERVER_CONFIGS_PATH, fileName));
+                const filePrefix = `UR_${path.basename(fileName, '.json').toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+
+                applyEnvOverrides(config, filePrefix);
+                applyEnvOverrides(config, 'UR_SERVER_DEFAULT');
+
+                configs.push(config);
+            });
+        } else {
+            console.warn(`[ConfigLoader] Server configs path not found at ${SERVER_CONFIGS_PATH}, falling back to env-only mode`);
+            // Fallback to env-only mode for servers
+            const serverPrefixes = new Set();
+            Object.keys(process.env).forEach((key) => {
+                const match = key.match(/^UR_(SERVER\d+)__/);
+                if (match) {
+                    serverPrefixes.add(match[1]);
+                }
+            });
+            
+            serverPrefixes.forEach((prefix) => {
+                const config = buildConfigFromEnv(`UR_${prefix}`);
+                if (config.SERVER_ENABLED !== false) {
+                    configs.push(config);
+                }
+            });
+        }
+    }
+    
+    return configs;
 }
 
 const globalConfig = loadGlobalConfig();

@@ -4,7 +4,6 @@ set -eu
 REPO_DIR="${REPO_DIR:-/bot/repo}"
 GIT_REPO="${GIT_REPO:-https://github.com/mtvProof/UltimateRcon.git}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
-LOCAL_CONFIGS_DIR="${LOCAL_CONFIGS_DIR:-/bot/local-configs}"
 LOCAL_DATABASE_DIR="${LOCAL_DATABASE_DIR:-/bot/local-database}"
 LOCAL_IMAGESTORE_DIR="${LOCAL_IMAGESTORE_DIR:-/bot/local-imagestorage}"
 
@@ -24,11 +23,7 @@ cd "$REPO_DIR"
 
 mkdir -p src/images
 
-if [ -d "$LOCAL_CONFIGS_DIR" ]; then
-    rm -rf "$REPO_DIR/CONFIGS"
-    ln -s "$LOCAL_CONFIGS_DIR" "$REPO_DIR/CONFIGS"
-fi
-
+# Only link database and image storage (no more config files needed!)
 if [ -d "$LOCAL_DATABASE_DIR" ]; then
     rm -rf "$REPO_DIR/src/database"
     ln -s "$LOCAL_DATABASE_DIR" "$REPO_DIR/src/database"
@@ -43,5 +38,6 @@ echo "[start] Installing npm dependencies"
 npm install --omit=dev --no-audit --no-fund
 npm rebuild canvas --build-from-source
 
-echo "[start] Running bot"
+echo "[start] Running bot in ENV_ONLY mode (configuration from environment variables)"
 exec npm start
+

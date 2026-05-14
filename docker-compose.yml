@@ -3,18 +3,16 @@ services:
     build: .
     container_name: ultimate-rcon
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - GIT_REPO=https://github.com/mtvProof/UltimateRcon.git
-      - GIT_BRANCH=main
-      - REPO_DIR=/bot/repo
-      - LOCAL_CONFIGS_DIR=/bot/local-configs
-      - LOCAL_DATABASE_DIR=/bot/local-database
-      - LOCAL_IMAGESTORE_DIR=/bot/local-imagestorage
+      # Enable environment-only mode (no config JSON files needed)
+      - UR_ENV_ONLY=true
     volumes:
       - ur_bot_repo:/bot
-      - ${CONFIGS_DIR}:/bot/local-configs
-      - ${DATABASE_DIR}:/bot/local-database
-      - ${IMAGESTORE_DIR}:/bot/local-imagestorage
+      - ${DATABASE_DIR:-./data/database}:/bot/local-database
+      - ${IMAGESTORE_DIR:-./data/imagestorage}:/bot/local-imagestorage
 
 volumes:
   ur_bot_repo:
+
