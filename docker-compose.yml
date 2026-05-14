@@ -7,10 +7,5 @@ services:
       # Enable environment-only mode (no config JSON files needed)
       - UR_ENV_ONLY=true
     volumes:
-      - ur_bot_repo:/bot
-      - ${DATABASE_DIR:-./data/database}:/bot/local-database
-      - ${IMAGESTORE_DIR:-./data/imagestorage}:/bot/local-imagestorage
-
-volumes:
-  ur_bot_repo:
-
+      - ${DATABASE_DIR:-./data/database}:/data/database
+      - ${IMAGESTORE_DIR:-./data/imagestorage}:/data/imagestorage

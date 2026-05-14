@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 
-REPO_DIR="${REPO_DIR:-/bot/repo}"
+REPO_DIR="${REPO_DIR:-/bot}"
 GIT_REPO="${GIT_REPO:-https://github.com/mtvProof/UltimateRcon.git}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
-LOCAL_DATABASE_DIR="${LOCAL_DATABASE_DIR:-/bot/local-database}"
-LOCAL_IMAGESTORE_DIR="${LOCAL_IMAGESTORE_DIR:-/bot/local-imagestorage}"
+LOCAL_DATABASE_DIR="${LOCAL_DATABASE_DIR:-/data/database}"
+LOCAL_IMAGESTORE_DIR="${LOCAL_IMAGESTORE_DIR:-/data/imagestorage}"
 
 mkdir -p "$REPO_DIR"
 
