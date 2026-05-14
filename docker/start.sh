@@ -24,14 +24,23 @@ cd "$REPO_DIR"
 mkdir -p src/images
 
 # Only link database and image storage (no more config files needed!)
+# Check if it's already a symlink or mounted, if not create symlink
 if [ -d "$LOCAL_DATABASE_DIR" ]; then
-    rm -rf "$REPO_DIR/src/database"
-    ln -s "$LOCAL_DATABASE_DIR" "$REPO_DIR/src/database"
+    if [ ! -L "$REPO_DIR/src/database" ] && [ ! -d "$REPO_DIR/src/database" ]; then
+        ln -s "$LOCAL_DATABASE_DIR" "$REPO_DIR/src/database"
+    elif [ -d "$REPO_DIR/src/database" ] && [ ! -L "$REPO_DIR/src/database" ]; then
+        rm -rf "$REPO_DIR/src/database"
+        ln -s "$LOCAL_DATABASE_DIR" "$REPO_DIR/src/database"
+    fi
 fi
 
 if [ -d "$LOCAL_IMAGESTORE_DIR" ]; then
-    rm -rf "$REPO_DIR/src/images/imagestorage"
-    ln -s "$LOCAL_IMAGESTORE_DIR" "$REPO_DIR/src/images/imagestorage"
+    if [ ! -L "$REPO_DIR/src/images/imagestorage" ] && [ ! -d "$REPO_DIR/src/images/imagestorage" ]; then
+        ln -s "$LOCAL_IMAGESTORE_DIR" "$REPO_DIR/src/images/imagestorage"
+    elif [ -d "$REPO_DIR/src/images/imagestorage" ] && [ ! -L "$REPO_DIR/src/images/imagestorage" ]; then
+        rm -rf "$REPO_DIR/src/images/imagestorage"
+        ln -s "$LOCAL_IMAGESTORE_DIR" "$REPO_DIR/src/images/imagestorage"
+    fi
 fi
 
 echo "[start] Installing npm dependencies"
