@@ -3,8 +3,6 @@ services:
     build: .
     container_name: ultimate-rcon
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       # Enable environment-only mode (no config JSON files needed)
       - UR_ENV_ONLY=true
