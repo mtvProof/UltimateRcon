@@ -1,9 +1,14 @@
-]633;E;sudo reboot;d907429b-4956-4bbf-9c1a-58468e0e0bfe]633;Cservices:
+services:
   ultimate-rcon:
     build: .
     container_name: ultimate-rcon
     restart: unless-stopped
     environment:
+      - UR_ENV_ONLY
+      - GIT_REPO
+      - GIT_BRANCH
+      - DATABASE_DIR
+      - IMAGESTORE_DIR
       - UR_CONFIG__DISCORD_SERVER_ID
       - UR_CONFIG__STEAM_API_KEY
       - UR_CONFIG__GLOBAL_POP_BOT__ENABLED
