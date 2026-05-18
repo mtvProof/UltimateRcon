@@ -8,3 +8,13 @@ yarn-error.log*
 !.env.example
 src/images/imagestorage/*.png
 CONFIGS/
+
+# Portainer environment files
+.env.portainer.ready
+.env.portainer.*
+.env.clean
+
+# Portainer environment files (contain sensitive tokens)
+.env.portainer.ready
+.env.portainer.*
+.env.clean
