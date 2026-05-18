@@ -13,8 +13,16 @@ function parseEnvValue(rawValue) {
     if (rawValue === 'false') return false;
     if (rawValue === 'null') return null;
 
+    // Check if it looks like a number
     if (/^-?\d+(\.\d+)?$/.test(rawValue)) {
-        return Number(rawValue);
+        // Don't convert very large integers (like Discord IDs) to numbers
+        // JavaScript can't safely represent integers larger than 2^53 - 1
+        const asNumber = Number(rawValue);
+        if (Number.isSafeInteger(asNumber)) {
+            return asNumber;
+        }
+        // Keep large integers as strings to avoid precision loss
+        return rawValue;
     }
 
     const trimmed = rawValue.trim();
