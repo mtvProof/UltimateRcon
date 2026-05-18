@@ -3,8 +3,6 @@ services:
     build: .
     container_name: ultimate-rcon
     restart: unless-stopped
-    env_file:
-      - .env.production
     volumes:
       - ${DATABASE_DIR:-./data/database}:/data/database
       - ${IMAGESTORE_DIR:-./data/imagestorage}:/data/imagestorage
