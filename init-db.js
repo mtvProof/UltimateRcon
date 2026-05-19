@@ -20,11 +20,14 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS server_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         server_id TEXT NOT NULL,
-        log_type TEXT NOT NULL,
+        current_players INTEGER DEFAULT 0,
+        peak_players INTEGER DEFAULT 0,
+        last_wipe INTEGER DEFAULT 0,
+        log_type TEXT,
         message TEXT,
         player_name TEXT,
         player_steamid TEXT,
-        timestamp INTEGER NOT NULL
+        timestamp INTEGER
     );
     `, (err) => {
         if (err) console.error('[DB Init] Error creating server_logs:', err);
@@ -34,7 +37,9 @@ db.serialize(() => {
     // Player information table
     db.run(`
     CREATE TABLE IF NOT EXISTS player_info (
-        steamid TEXT PRIMARY KEY,
+        steam_id TEXT NOT NULL,
+        server_id TEXT NOT NULL,
+        picture TEXT,
         name TEXT,
         avatar TEXT,
         profile_url TEXT,
@@ -50,7 +55,16 @@ db.serialize(() => {
         last_seen INTEGER,
         total_joins INTEGER DEFAULT 0,
         lastUpdated INTEGER,
-        watchlist INTEGER DEFAULT 0
+        watchlist INTEGER DEFAULT 0,
+        checker_whitelisted INTEGER DEFAULT 0,
+        ignore_f7_from INTEGER DEFAULT 0,
+        ignore_f7_against INTEGER DEFAULT 0,
+        report_count INTEGER DEFAULT 0,
+        kills INTEGER DEFAULT 0,
+        deaths INTEGER DEFAULT 0,
+        wipe_kills INTEGER DEFAULT 0,
+        wipe_deaths INTEGER DEFAULT 0,
+        PRIMARY KEY (steam_id, server_id)
     );
     `, (err) => {
         if (err) console.error('[DB Init] Error creating player_info:', err);
