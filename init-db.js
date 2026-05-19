@@ -23,6 +23,8 @@ db.serialize(() => {
         current_players INTEGER DEFAULT 0,
         peak_players INTEGER DEFAULT 0,
         last_wipe INTEGER DEFAULT 0,
+        joining_players INTEGER DEFAULT 0,
+        queued_players INTEGER DEFAULT 0,
         log_type TEXT,
         message TEXT,
         player_name TEXT,
