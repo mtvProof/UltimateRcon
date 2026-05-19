@@ -48,6 +48,12 @@ echo "[start] Installing npm dependencies"
 npm install --omit=dev --no-audit --no-fund
 npm rebuild canvas --build-from-source
 
+# Initialize database tables if they don't exist
+if [ -f "$REPO_DIR/init-db.js" ]; then
+    echo "[start] Initializing database tables (if needed)..."
+    node "$REPO_DIR/init-db.js" || echo "[start] Database initialization failed (tables may already exist)"
+fi
+
 echo "[start] Running bot in ENV_ONLY mode (configuration from environment variables)"
 exec npm start
 
