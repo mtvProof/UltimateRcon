@@ -110,22 +110,15 @@ function loadGlobalConfig() {
     
     // If ENV_ONLY_MODE, build config entirely from environment variables
     if (ENV_ONLY_MODE) {
-        // Debug: List all UR_CONFIG env vars
         const urConfigVars = Object.keys(process.env).filter(k => k.startsWith('UR_CONFIG'));
         console.log('[ConfigLoader] Found', urConfigVars.length, 'UR_CONFIG environment variables');
         if (urConfigVars.length === 0) {
             console.error('[ConfigLoader] ERROR: No UR_CONFIG__ environment variables found!');
             console.error('[ConfigLoader] Make sure environment variables are properly set in Portainer.');
-            console.error('[ConfigLoader] Sample env vars present:', Object.keys(process.env).slice(0, 10));
         }
         
         config = buildConfigFromEnv('UR_CONFIG');
         console.log('[ConfigLoader] Running in ENV_ONLY mode - loaded config from environment variables');
-        console.log('[ConfigLoader] Global config keys:', Object.keys(config));
-        console.log('[ConfigLoader] PLAYER_PROFILER exists:', !!config.PLAYER_PROFILER);
-        console.log('[ConfigLoader] **DEBUG** RAW ENV VAR:', process.env.UR_CONFIG__DISCORD_SERVER_ID);
-        console.log('[ConfigLoader] **DEBUG** DISCORD_SERVER_ID loaded as:', config.DISCORD_SERVER_ID);
-        console.log('[ConfigLoader] **DEBUG** Type:', typeof config.DISCORD_SERVER_ID);
     } else {
         // Legacy mode: read from JSON file and allow env overrides
         if (fs.existsSync(CONFIG_PATH)) {

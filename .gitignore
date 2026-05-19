@@ -3,19 +3,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# Environment files (contain sensitive tokens/keys)
 .env
 .env.*
 !.env.example
-!.env.docker
-src/images/imagestorage/*.png
+
+# Configuration files (contain server-specific settings)
 CONFIGS/
 
-# Portainer environment files
-.env.portainer.ready
-.env.portainer.*
-.env.clean
+# Image storage
+src/images/imagestorage/*.png
 
-# Portainer environment files (contain sensitive tokens)
-.env.portainer.ready
-.env.portainer.*
 .env.clean
