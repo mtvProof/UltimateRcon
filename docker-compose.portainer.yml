@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  ultimate-rcon:
+    build: .
+    container_name: ultimate-rcon
+    restart: unless-stopped
+    env_file:
+      - .env
+
+    volumes:
+      - ./data/database:/data/database
+      - ./data/imagestorage:/data/imagestorage
+      # Optional mounts for your local plugin folders (read-only)
+      - /home/mtvproof/Desktop/BuildServer/plugins:/host_plugins/buildserver_plugins:ro
+      - "/home/mtvproof/Desktop/US 2x Server/plugins:/host_plugins/us2x_plugins:ro"
+
+    networks:
+      - urnet
+
+networks:
+  urnet:
+    driver: bridge
