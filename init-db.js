@@ -74,28 +74,47 @@ db.serialize(() => {
     });
 
     // Leaderboard table
+    // NOTE: channel_id/message_id are required by establishConnection.js to
+    // track which Discord message holds the leaderboard embed so it can be
+    // edited in place, instead of being reposted every update.
     db.run(`
     CREATE TABLE IF NOT EXISTS leaderboard (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         server_id TEXT NOT NULL,
-        steamid TEXT NOT NULL,
+        channel_id TEXT,
+        message_id TEXT,
+        steamid TEXT,
         player_name TEXT,
         kills INTEGER DEFAULT 0,
         deaths INTEGER DEFAULT 0,
         kd_ratio REAL DEFAULT 0,
         playtime INTEGER DEFAULT 0,
         wipe_cycle TEXT,
-        updated_at INTEGER NOT NULL
+        updated_at INTEGER
     );
     `, (err) => {
         if (err) console.error('[DB Init] Error creating leaderboard:', err);
         else console.log('[DB Init] ✓ leaderboard table created');
     });
 
+    // Migrations for leaderboard table (in case it already existed from an
+    // older schema that lacked these columns)
+    db.run(`ALTER TABLE leaderboard ADD COLUMN channel_id TEXT;`, (err) => {
+        if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating leaderboard.channel_id:', err);
+    });
+    db.run(`ALTER TABLE leaderboard ADD COLUMN message_id TEXT;`, (err) => {
+        if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating leaderboard.message_id:', err);
+    });
+
     // Server status table
+    // NOTE: channel_id/message_id are required by establishConnection.js to
+    // track which Discord message holds the server status embed so it can
+    // be edited in place.
     db.run(`
     CREATE TABLE IF NOT EXISTS server_status (
-        server_id TEXT PRIMARY KEY,
+        server_id TEXT NOT NULL,
+        channel_id TEXT,
+        message_id TEXT,
         online INTEGER DEFAULT 0,
         players_online INTEGER DEFAULT 0,
         max_players INTEGER DEFAULT 0,
@@ -105,11 +124,20 @@ db.serialize(() => {
         last_wipe INTEGER,
         map_seed TEXT,
         map_size TEXT,
-        last_updated INTEGER NOT NULL
+        last_updated INTEGER
     );
     `, (err) => {
         if (err) console.error('[DB Init] Error creating server_status:', err);
         else console.log('[DB Init] ✓ server_status table created');
+    });
+
+    // Migrations for server_status table (in case it already existed from an
+    // older schema that lacked these columns)
+    db.run(`ALTER TABLE server_status ADD COLUMN channel_id TEXT;`, (err) => {
+        if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating server_status.channel_id:', err);
+    });
+    db.run(`ALTER TABLE server_status ADD COLUMN message_id TEXT;`, (err) => {
+        if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating server_status.message_id:', err);
     });
 
     // Create indexes
