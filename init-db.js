@@ -106,6 +106,27 @@ db.serialize(() => {
         if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating leaderboard.message_id:', err);
     });
 
+    // De-duplicate leaderboard rows: only one leaderboard message should ever
+    // be tracked per server_id. Past bugs (missing channel_id column caused
+    // the lookup query to never match, so a brand new row + message got
+    // created every cycle) left many stale duplicate rows behind, some of
+    // which point at deleted Discord messages. Keep only the most recent row
+    // per server_id so the bot can't pick a stale/broken row and loop.
+    db.run(`
+    DELETE FROM leaderboard
+    WHERE id NOT IN (
+        SELECT MAX(id) FROM leaderboard GROUP BY server_id
+    );
+    `, (err) => {
+        if (err) console.error('[DB Init] Error de-duplicating leaderboard:', err);
+        else console.log('[DB Init] ✓ leaderboard duplicates cleaned up');
+    });
+
+    // Enforce one row per server_id going forward
+    db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_leaderboard_unique_server ON leaderboard(server_id);`, (err) => {
+        if (err) console.error('[DB Init] Error creating unique index on leaderboard:', err);
+    });
+
     // Server status table
     // NOTE: channel_id/message_id are required by establishConnection.js to
     // track which Discord message holds the server status embed so it can
@@ -138,6 +159,23 @@ db.serialize(() => {
     });
     db.run(`ALTER TABLE server_status ADD COLUMN message_id TEXT;`, (err) => {
         if (err && !/duplicate column/i.test(err.message)) console.error('[DB Init] Error migrating server_status.message_id:', err);
+    });
+
+    // De-duplicate server_status rows for the same reason as leaderboard
+    // above: only one status message should ever be tracked per server_id.
+    db.run(`
+    DELETE FROM server_status
+    WHERE rowid NOT IN (
+        SELECT MAX(rowid) FROM server_status GROUP BY server_id
+    );
+    `, (err) => {
+        if (err) console.error('[DB Init] Error de-duplicating server_status:', err);
+        else console.log('[DB Init] ✓ server_status duplicates cleaned up');
+    });
+
+    // Enforce one row per server_id going forward
+    db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_server_status_unique_server ON server_status(server_id);`, (err) => {
+        if (err) console.error('[DB Init] Error creating unique index on server_status:', err);
     });
 
     // Create indexes

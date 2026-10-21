@@ -1273,7 +1273,7 @@ function createNewGlobalLeaderboard(channel) {
     const attachment = new discord.AttachmentBuilder(`./src/images/leaderboard/leaderboard_custom.png`);
     embed.setImage(`attachment://leaderboard_global.png`)
     channel.send({ embeds: [embed.setTitle("GLOBAL LEADERBOARD").setImage(`attachment://leaderboard_custom.png`).setTimestamp().setFooter({text:"Leaderboard / last updated"})], files: [attachment] }).then(theMsg => {
-        db.all(`insert into leaderboard (channel_id, message_id, server_id) values (?,?,?);`, [config.PLAYER_PROFILER.GLOBAL_LEADERBOARD.CHANNEL_ID, theMsg.id, "global"], async function(err, table) {
+        db.all(`insert or replace into leaderboard (channel_id, message_id, server_id) values (?,?,?);`, [config.PLAYER_PROFILER.GLOBAL_LEADERBOARD.CHANNEL_ID, theMsg.id, "global"], async function(err, table) {
             if(err) console.log(err);
         });
     }); 
@@ -1595,7 +1595,7 @@ function createNewLeaderboard(server, channel, buttonList) {
     const attachment = new discord.AttachmentBuilder(`./src/images/leaderboard/leaderboard_${server.LEADERBOARD["COLOR(original, green, blue, black, yellow, orange, pink, red, purple, custom)"]}.png`);
     embed.setImage(`attachment://leaderboard_${server.LEADERBOARD["COLOR(original, green, blue, black, yellow, orange, pink, red, purple, custom)"]}.png`)
     channel.send({ components: [buttonList], embeds: [embed.setTitle(server.SERVER_SHORTNAME).setImage(`attachment://leaderboard_${server.LEADERBOARD["COLOR(original, green, blue, black, yellow, orange, pink, red, purple, custom)"]}.png`).setTimestamp().setFooter({text:"Leaderboard / last updated"})], files: [attachment] }).then(theMsg => {
-        db.all(`insert into leaderboard (channel_id, message_id, server_id) values (?,?,?);`, [server.LEADERBOARD.CHANNEL_ID, theMsg.id, server.SERVER_SPECIAL_ID], async function(err, table) {
+        db.all(`insert or replace into leaderboard (channel_id, message_id, server_id) values (?,?,?);`, [server.LEADERBOARD.CHANNEL_ID, theMsg.id, server.SERVER_SPECIAL_ID], async function(err, table) {
             if(err) console.log(err);
         });
     }); 
@@ -1605,7 +1605,7 @@ function createNewServerStatus(server, channel) {
     const embed = new discord.EmbedBuilder();
     const attachment = new discord.AttachmentBuilder(`./src/images/serverstatus/serverstatus_${server.SERVER_STATUS_PAGE["COLOR(original, green, blue, black, yellow, orange, pink, red, purple, custom)"].toLowerCase()}.png`);
     channel.send({ embeds: [embed.setTitle(server.SERVER_SHORTNAME).setImage(`attachment://ServerStatus.png`)], files: [attachment] }).then(theMsg => {
-        db.run(`insert into server_status (channel_id, message_id, server_id) values (?,?,?);`, [server.SERVER_STATUS_PAGE.CHANNEL_ID, theMsg.id, server.SERVER_SPECIAL_ID ]);
+        db.run(`insert or replace into server_status (channel_id, message_id, server_id) values (?,?,?);`, [server.SERVER_STATUS_PAGE.CHANNEL_ID, theMsg.id, server.SERVER_SPECIAL_ID ]);
     });
 }
 
