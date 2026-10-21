@@ -100,7 +100,7 @@ servers.forEach((server, index) => {
     });
 
     let rconIp = server.SERVER_IP;
-    if(server.SERVER_IP.includes(":")) rconIp = rconIp.slice(":")[0];
+    if(server.SERVER_IP.includes(":")) rconIp = rconIp.split(":")[0];
 
     const client = new discord.Client({intents: [discord.GatewayIntentBits.Guilds, discord.GatewayIntentBits.GuildMembers, discord.GatewayIntentBits.GuildEmojisAndStickers, discord.GatewayIntentBits.GuildIntegrations, discord.GatewayIntentBits.GuildWebhooks, discord.GatewayIntentBits.GuildInvites, discord.GatewayIntentBits.GuildVoiceStates, discord.GatewayIntentBits.GuildPresences, discord.GatewayIntentBits.GuildMessages, discord.GatewayIntentBits.GuildMessageReactions, discord.GatewayIntentBits.GuildMessageTyping, discord.GatewayIntentBits.DirectMessages, discord.GatewayIntentBits.DirectMessageReactions, discord.GatewayIntentBits.DirectMessageTyping, discord.GatewayIntentBits.MessageContent], shards: "auto", partials: [discord.Partials.Message, discord.Partials.Channel, discord.Partials.GuildMember, discord.Partials.Reaction, discord.Partials.GuildScheduledEvent, discord.Partials.User, discord.Partials.ThreadMember]});
 
